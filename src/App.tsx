@@ -1,56 +1,36 @@
-import { ChangeEvent, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+
 import Header from "./components/Header";
 import Footer from "./components/Footer";
+import NowBoarding from "./components/NowBoarding";
 import QueueForm from "./components/QueueForm";
+import QueueList from "./components/QueueList";
+import QueueSummary from "./components/QueueSummary";
+import  { QUEUE } from "./types/queue";
 
-
-const QUEUE_URL = "./initial-queue.json";
-
-interface QUEUE {
-  id: number;
-  groupName: string;
-  riders: number;
-}
+const QUEUE_URL = "/initial-queue.json";
 
 async function fetchQueueData(): Promise<QUEUE[]> {
   const response = await fetch(QUEUE_URL);
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch queue");
+  }
+
   const data = (await response.json()) as QUEUE[];
+
   return data;
 }
 
 function App() {
   const [queue, setQueue] = useState<QUEUE[]>([]);
-  const [isLoadingQueue, setIsLoading] = useState(true);
+  const [isLoadingQueue, setIsLoadingQueue] = useState(true);
   const [hasQueueError, setHasQueueError] = useState(false);
   const [nowBoarding, setNowBoarding] = useState<QUEUE | null>(null);
-
-
-  function handleAddGroup(groupName: string, riders: number) {
-    const newEntry: QUEUE = {
-      id: queue.length + 1,
-      groupName,
-      riders,
-    };
-
-    setQueue((currentQueue) => [...currentQueue, newEntry]);
-  }
-
- function handleBoardNext() {
-   if (queue.length === 0) {
-     return;
-   }
-
-   const [boardedGroup, ...remainingQueue] = queue;
-
-   setQueue(remainingQueue);
-   setNowBoarding(boardedGroup);
- }
-
-
-
+  const [boardedCount, setBoardedCount] = useState(0);
 
   async function loadQueue() {
-    setIsLoading(true);
+    setIsLoadingQueue(true);
     setHasQueueError(false);
 
     try {
@@ -60,17 +40,47 @@ function App() {
       console.error("Error loading queue:", error);
       setHasQueueError(true);
     } finally {
-      setIsLoading(false);
+      setIsLoadingQueue(false);
     }
   }
 
+  function handleAddGroup(groupName: string, riders: number) {
+    const newEntry: QUEUE = {
+      id: Date.now(),
+      groupName,
+      riders,
+    };
+
+    setQueue((currentQueue) => [...currentQueue, newEntry]);
+  }
+
+  function handleBoardNext() {
+    if (queue.length === 0) {
+      return;
+    }
+
+    const [boardedGroup, ...remainingQueue] = queue;
+
+    setQueue(remainingQueue);
+    setNowBoarding(boardedGroup);
+    setBoardedCount((currentCount) => currentCount + 1);
+  }
+
+  const waitingGroupsCount = queue.length;
+
+  const waitingRidersCount = queue.reduce(
+    (totalRiders, entry) => totalRiders + entry.riders,
+    0,
+  );
+
   useEffect(() => {
-    loadQueue();
+    void loadQueue();
   }, []);
 
   return (
     <div className="app-shell">
       <Header />
+
       <main className="main-content">
         {isLoadingQueue && (
           <p className="status-message">Loading the ride queue...</p>
@@ -85,81 +95,64 @@ function App() {
             </button>
           </div>
         )}
-        <QueueForm onAddGroup={handleAddGroup} />
-        <section className="now-boarding" aria-live="polite">
-          <div>
-            <p className="now-boarding-label">Now Boarding</p>
-
-            {nowBoarding ? (
-              <>
-                <h2 className="now-boarding-name">{nowBoarding.groupName}</h2>
-
-                <p className="now-boarding-meta">
-                  {nowBoarding.riders}{" "}
-                  {nowBoarding.riders === 1 ? "rider" : "riders"}
-                </p>
-              </>
-            ) : (
-              <p className="no-boarding-yet">No group has boarded yet.</p>
-            )}
-          </div>
-        </section>
 
         {!isLoadingQueue && !hasQueueError && (
-          <section className="queue-section">
-            <div className="section-heading">
-              <div>
-                <p className="section-eyebrow">Skyline Comet</p>
-                <h1 className="section-title">Waiting line</h1>
-                <p className="section-description">
-                  Groups board in the order they arrive.
-                </p>
+          <>
+            <QueueSummary
+              waitingGroupsCount={waitingGroupsCount}
+              waitingRidersCount={waitingRidersCount}
+              boardedCount={boardedCount}
+            />
+
+            <section className="queue-section">
+              <div className="section-heading">
+                <div>
+                  <p className="section-eyebrow">Join the line</p>
+                  <h1 className="section-title">Add a group</h1>
+                  <p className="section-description">
+                    New groups always join at the back of the queue.
+                  </p>
+                </div>
               </div>
 
-              <span className="queue-count">
-                {queue.length} {queue.length === 1 ? "group" : "groups"} waiting
-              </span>
-              <button
-                type="button"
-                className="board-next-button"
-                onClick={handleBoardNext}
-                disabled={queue.length === 0}
-              >
-                Board Next
-              </button>
-            </div>
+              <QueueForm onAddGroup={handleAddGroup} />
+            </section>
 
-            {queue.length === 0 ? (
-              <p className="queue-empty">No groups are waiting right now.</p>
-            ) : (
-              <ul className="queue-list">
-                {queue.map((entry, index) => (
-                  <li
-                    key={entry.id}
-                    className={`queue-card ${index === 0 ? "next-to-board" : ""}`}
+            <NowBoarding entry={nowBoarding} />
+
+            <section className="queue-section">
+              <div className="section-heading">
+                <div>
+                  <p className="section-eyebrow">Skyline Comet</p>
+                  <h1 className="section-title">Waiting line</h1>
+                  <p className="section-description">
+                    Groups board in the order they arrive.
+                  </p>
+                </div>
+
+                <div className="queue-actions">
+                  <span className="queue-count">
+                    {queue.length} {queue.length === 1 ? "group" : "groups"}{" "}
+                    waiting
+                  </span>
+
+                  <button
+                    type="button"
+                    className="board-next-button"
+                    onClick={handleBoardNext}
+                    disabled={queue.length === 0}
                   >
-                    <span className="queue-position">
-                      {String(index + 1).padStart(2, "0")}
-                    </span>
+                    Board Next
+                  </button>
+                </div>
+              </div>
 
-                    <div className="queue-card-info">
-                      {index === 0 && (
-                        <span className="next-label">NEXT TO BOARD</span>
-                      )}
-
-                      <h2 className="queue-group-name">{entry.groupName}</h2>
-
-                      <p className="queue-rider-count">
-                        {entry.riders} {entry.riders === 1 ? "rider" : "riders"}
-                      </p>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </section>
+              <QueueList queue={queue} />
+            </section>
+          </>
         )}
       </main>
+
       <Footer />
     </div>
   );
