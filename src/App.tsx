@@ -1,6 +1,8 @@
 import { ChangeEvent, useEffect, useState } from "react";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
+import QueueForm from "./components/QueueForm";
+
 
 const QUEUE_URL = "./initial-queue.json";
 
@@ -20,6 +22,17 @@ function App() {
   const [queue, setQueue] = useState<QUEUE[]>([]);
   const [isLoadingQueue, setIsLoading] = useState(true);
   const [hasQueueError, setHasQueueError] = useState(false);
+
+  function handleAddGroup(groupName: string, riders: number) {
+    const newEntry: QUEUE = {
+      id: queue.length + 1,
+      groupName,
+      riders,
+    };
+
+    setQueue((currentQueue) => [...currentQueue, newEntry]);
+  }
+
 
   async function loadQueue() {
     setIsLoading(true);
@@ -57,7 +70,7 @@ function App() {
             </button>
           </div>
         )}
-
+        <QueueForm onAddGroup={handleAddGroup} />
         {!isLoadingQueue && !hasQueueError && (
           <section className="queue-section">
             <div className="section-heading">
