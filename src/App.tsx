@@ -63,12 +63,45 @@ function App() {
             <div className="section-heading">
               <div>
                 <p className="section-eyebrow">Skyline Comet</p>
-                <h1 className="section-title">RideLine</h1>
+                <h1 className="section-title">Waiting line</h1>
                 <p className="section-description">
-                  {queue.length} groups are waiting in line.
+                  Groups board in the order they arrive.
                 </p>
               </div>
+
+              <span className="queue-count">
+                {queue.length} {queue.length === 1 ? "group" : "groups"} waiting
+              </span>
             </div>
+
+            {queue.length === 0 ? (
+              <p className="queue-empty">No groups are waiting right now.</p>
+            ) : (
+              <ul className="queue-list">
+                {queue.map((entry, index) => (
+                  <li
+                    key={entry.id}
+                    className={`queue-card ${index === 0 ? "next-to-board" : ""}`}
+                  >
+                    <span className="queue-position">
+                      {String(index + 1).padStart(2, "0")}
+                    </span>
+
+                    <div className="queue-card-info">
+                      {index === 0 && (
+                        <span className="next-label">NEXT TO BOARD</span>
+                      )}
+
+                      <h2 className="queue-group-name">{entry.groupName}</h2>
+
+                      <p className="queue-rider-count">
+                        {entry.riders} {entry.riders === 1 ? "rider" : "riders"}
+                      </p>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
           </section>
         )}
       </main>
