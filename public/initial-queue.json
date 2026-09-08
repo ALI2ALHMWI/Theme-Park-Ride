@@ -1,0 +1,8 @@
+[
+  { "id": 1, "groupName": "The Alvarez Family", "riders": 4 },
+  { "id": 2, "groupName": "Priya + Dev", "riders": 2 },
+  { "id": 3, "groupName": "Riverside Scouts Troop 12", "riders": 8 },
+  { "id": 4, "groupName": "Marcus", "riders": 1 },
+  { "id": 5, "groupName": "The Chen-Osei Party", "riders": 5 },
+  { "id": 6, "groupName": "Late Birthday Crew", "riders": 6 }
+]
