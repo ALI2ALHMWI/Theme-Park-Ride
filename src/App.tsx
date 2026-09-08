@@ -73,6 +73,9 @@ function App() {
     0,
   );
 
+  const isQueueLong = queue.length >= 8;
+
+
   useEffect(() => {
     void loadQueue();
   }, []);
@@ -103,6 +106,21 @@ function App() {
               waitingRidersCount={waitingRidersCount}
               boardedCount={boardedCount}
             />
+
+            {isQueueLong && (
+              <aside className="queue-warning" role="status" aria-live="polite">
+                <span className="queue-warning-mark" aria-hidden="true">
+                  !
+                </span>
+
+                <div>
+                  <strong>Long line ahead</strong>
+                  <p>
+                    The queue is busy right now. Please expect a longer wait.
+                  </p>
+                </div>
+              </aside>
+            )}
 
             <section className="queue-section">
               <div className="section-heading">

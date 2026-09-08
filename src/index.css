@@ -653,3 +653,49 @@ a:focus-visible {
     transform: rotate(360deg);
   }
 }
+/* ---------- Long Queue Warning ---------- */
+
+.queue-warning {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.9rem;
+  margin-top: 1.5rem;
+  border: 1px solid rgba(238, 129, 114, 0.65);
+  background: rgba(238, 129, 114, 0.1);
+  padding: 1rem 1.1rem;
+  color: var(--board-text);
+}
+
+.queue-warning-mark {
+  display: grid;
+  width: 1.7rem;
+  height: 1.7rem;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 1px solid var(--board-coral);
+  border-radius: 50%;
+  color: var(--board-coral);
+  font-family: "DM Mono", monospace;
+  font-weight: 500;
+}
+
+.queue-warning strong {
+  display: block;
+  color: #ffab9e;
+  font-family: "DM Mono", monospace;
+  font-size: 0.76rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.queue-warning p {
+  margin-top: 0.25rem;
+  color: var(--board-muted);
+  font-size: 0.84rem;
+}
+
+@media (max-width: 620px) {
+  .queue-warning {
+    padding: 0.9rem;
+  }
+}
