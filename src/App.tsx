@@ -1,35 +1,58 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { ChangeEvent, useEffect, useState } from "react";
+const QUEUE_URL = "./initial-queue.json";
 
-function App() {
-  const [count, setCount] = useState(0)
 
-  return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+interface QUEUE{
+  id: number;
+  groupName: string;
+  riders : number;
 }
 
-export default App
+async function fetchQueueData(): Promise<QUEUE[]> { 
+  const response = await fetch(QUEUE_URL);
+  const data = (await response.json()) as QUEUE[];
+  return data;
+}
+
+function App() {
+ const [queue, setQueue] = useState<QUEUE[]>([]);
+  const [isLoadingQueue, setIsLoading] = useState(true);
+
+  async function loadQueueData() {
+    setIsLoading(true);
+    try {
+      const QueueEntry = await fetchQueueData();
+      setQueue(QueueEntry);
+    } catch (error) { 
+     console.error("Error loading queue:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    loadQueueData();
+  }, []);
+
+  return (
+    <div className="app-shell">
+      <main className="main-content">
+        {isLoadingQueue && (
+          <p className="status-message">Loading the ride queue...</p>
+        )}
+
+        {!isLoadingQueue && (
+          <section className="queue-section">
+            <p className="section-eyebrow">Skyline Comet</p>
+            <h1 className="section-title">RideLine</h1>
+            <p className="section-description">
+              {queue.length} groups are waiting in line.
+            </p>
+          </section>
+        )}
+      </main>
+    </div>
+  );
+}
+
+export default App;
