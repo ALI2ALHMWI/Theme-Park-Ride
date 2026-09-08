@@ -1,4 +1,7 @@
 import { ChangeEvent, useEffect, useState } from "react";
+import Header from "./components/Header";
+import Footer from "./components/Footer";
+
 const QUEUE_URL = "./initial-queue.json";
 
 
@@ -36,6 +39,7 @@ function App() {
 
   return (
     <div className="app-shell">
+      <Header />
       <main className="main-content">
         {isLoadingQueue && (
           <p className="status-message">Loading the ride queue...</p>
@@ -51,6 +55,7 @@ function App() {
           </section>
         )}
       </main>
+      <Footer />
     </div>
   );
 }
