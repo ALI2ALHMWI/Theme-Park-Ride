@@ -4,37 +4,40 @@ import Footer from "./components/Footer";
 
 const QUEUE_URL = "./initial-queue.json";
 
-
-interface QUEUE{
+interface QUEUE {
   id: number;
   groupName: string;
-  riders : number;
+  riders: number;
 }
 
-async function fetchQueueData(): Promise<QUEUE[]> { 
+async function fetchQueueData(): Promise<QUEUE[]> {
   const response = await fetch(QUEUE_URL);
   const data = (await response.json()) as QUEUE[];
   return data;
 }
 
 function App() {
- const [queue, setQueue] = useState<QUEUE[]>([]);
+  const [queue, setQueue] = useState<QUEUE[]>([]);
   const [isLoadingQueue, setIsLoading] = useState(true);
+  const [hasQueueError, setHasQueueError] = useState(false);
 
-  async function loadQueueData() {
+  async function loadQueue() {
     setIsLoading(true);
+    setHasQueueError(false);
+
     try {
-      const QueueEntry = await fetchQueueData();
-      setQueue(QueueEntry);
-    } catch (error) { 
-     console.error("Error loading queue:", error);
+      const queueData = await fetchQueueData();
+      setQueue(queueData);
+    } catch (error) {
+      console.error("Error loading queue:", error);
+      setHasQueueError(true);
     } finally {
       setIsLoading(false);
     }
   }
 
   useEffect(() => {
-    loadQueueData();
+    loadQueue();
   }, []);
 
   return (
@@ -45,13 +48,27 @@ function App() {
           <p className="status-message">Loading the ride queue...</p>
         )}
 
-        {!isLoadingQueue && (
+        {!isLoadingQueue && hasQueueError && (
+          <div className="error-message" role="alert">
+            <p>We could not load the ride queue.</p>
+
+            <button type="button" className="retry-button" onClick={loadQueue}>
+              Try Again
+            </button>
+          </div>
+        )}
+
+        {!isLoadingQueue && !hasQueueError && (
           <section className="queue-section">
-            <p className="section-eyebrow">Skyline Comet</p>
-            <h1 className="section-title">RideLine</h1>
-            <p className="section-description">
-              {queue.length} groups are waiting in line.
-            </p>
+            <div className="section-heading">
+              <div>
+                <p className="section-eyebrow">Skyline Comet</p>
+                <h1 className="section-title">RideLine</h1>
+                <p className="section-description">
+                  {queue.length} groups are waiting in line.
+                </p>
+              </div>
+            </div>
           </section>
         )}
       </main>
