@@ -22,6 +22,8 @@ function App() {
   const [queue, setQueue] = useState<QUEUE[]>([]);
   const [isLoadingQueue, setIsLoading] = useState(true);
   const [hasQueueError, setHasQueueError] = useState(false);
+  const [nowBoarding, setNowBoarding] = useState<QUEUE | null>(null);
+
 
   function handleAddGroup(groupName: string, riders: number) {
     const newEntry: QUEUE = {
@@ -32,6 +34,19 @@ function App() {
 
     setQueue((currentQueue) => [...currentQueue, newEntry]);
   }
+
+ function handleBoardNext() {
+   if (queue.length === 0) {
+     return;
+   }
+
+   const [boardedGroup, ...remainingQueue] = queue;
+
+   setQueue(remainingQueue);
+   setNowBoarding(boardedGroup);
+ }
+
+
 
 
   async function loadQueue() {
@@ -71,6 +86,25 @@ function App() {
           </div>
         )}
         <QueueForm onAddGroup={handleAddGroup} />
+        <section className="now-boarding" aria-live="polite">
+          <div>
+            <p className="now-boarding-label">Now Boarding</p>
+
+            {nowBoarding ? (
+              <>
+                <h2 className="now-boarding-name">{nowBoarding.groupName}</h2>
+
+                <p className="now-boarding-meta">
+                  {nowBoarding.riders}{" "}
+                  {nowBoarding.riders === 1 ? "rider" : "riders"}
+                </p>
+              </>
+            ) : (
+              <p className="no-boarding-yet">No group has boarded yet.</p>
+            )}
+          </div>
+        </section>
+
         {!isLoadingQueue && !hasQueueError && (
           <section className="queue-section">
             <div className="section-heading">
@@ -85,6 +119,14 @@ function App() {
               <span className="queue-count">
                 {queue.length} {queue.length === 1 ? "group" : "groups"} waiting
               </span>
+              <button
+                type="button"
+                className="board-next-button"
+                onClick={handleBoardNext}
+                disabled={queue.length === 0}
+              >
+                Board Next
+              </button>
             </div>
 
             {queue.length === 0 ? (

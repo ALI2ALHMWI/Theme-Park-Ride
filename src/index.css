@@ -569,3 +569,31 @@ a:focus-visible {
     transition-duration: 0.01ms !important;
   }
 }
+.queue-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 1rem;
+}
+
+.queue-count {
+  color: #718096;
+  font-family: "DM Mono", monospace;
+  font-size: 0.78rem;
+  white-space: nowrap;
+}
+
+.board-next-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+  box-shadow: none;
+  transform: none;
+}
+
+@media (max-width: 600px) {
+  .queue-actions {
+    align-items: flex-start;
+    flex-direction: column;
+    margin-top: 1rem;
+  }
+}
