@@ -699,3 +699,64 @@ a:focus-visible {
     padding: 0.9rem;
   }
 }
+/* ---------- Recently Boarded ---------- */
+
+.recently-boarded {
+  margin-top: 1.5rem;
+  border: 1px solid var(--board-line);
+  background: rgba(13, 32, 40, 0.62);
+  padding: clamp(1.2rem, 3vw, 1.8rem);
+}
+
+.recently-boarded-title {
+  color: var(--board-text);
+  font-size: clamp(1.35rem, 3vw, 2rem);
+  font-weight: 800;
+  letter-spacing: -0.06em;
+}
+
+.recently-boarded-count {
+  color: var(--board-muted);
+  font-family: "DM Mono", monospace;
+  font-size: 0.68rem;
+}
+
+.recently-boarded-list {
+  display: grid;
+  gap: 0.55rem;
+  list-style: none;
+}
+
+.recently-boarded-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  border-top: 1px solid var(--board-line);
+  padding: 0.85rem 0;
+}
+
+.recently-boarded-position {
+  color: var(--board-yellow);
+  font-family: "DM Mono", monospace;
+  font-size: 0.8rem;
+}
+
+.recently-boarded-item strong {
+  color: var(--board-text);
+  font-size: 0.95rem;
+}
+
+.recently-boarded-item p {
+  margin-top: 0.2rem;
+  color: var(--board-muted);
+  font-family: "DM Mono", monospace;
+  font-size: 0.7rem;
+}
+
+.recently-boarded-empty {
+  border-top: 1px solid var(--board-line);
+  color: var(--board-muted);
+  padding-top: 1rem;
+  font-family: "DM Mono", monospace;
+  font-size: 0.75rem;
+}

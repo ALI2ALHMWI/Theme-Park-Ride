@@ -6,6 +6,7 @@ import NowBoarding from "./components/NowBoarding";
 import QueueForm from "./components/QueueForm";
 import QueueList from "./components/QueueList";
 import QueueSummary from "./components/QueueSummary";
+import RecentlyBoarded from "./components/RecentlyBoarded";
 import  { QUEUE } from "./types/queue";
 
 const QUEUE_URL = "/initial-queue.json";
@@ -28,6 +29,8 @@ function App() {
   const [hasQueueError, setHasQueueError] = useState(false);
   const [nowBoarding, setNowBoarding] = useState<QUEUE | null>(null);
   const [boardedCount, setBoardedCount] = useState(0);
+  const [boardedHistory, setBoardedHistory] = useState<QUEUE[]>([]);
+
 
   async function loadQueue() {
     setIsLoadingQueue(true);
@@ -64,7 +67,14 @@ function App() {
     setQueue(remainingQueue);
     setNowBoarding(boardedGroup);
     setBoardedCount((currentCount) => currentCount + 1);
+
+    setBoardedHistory((currentHistory) => {
+      const updatedHistory = [boardedGroup, ...currentHistory];
+
+      return updatedHistory.filter((_, index) => index < 3);
+    });
   }
+
 
   const waitingGroupsCount = queue.length;
 
@@ -137,6 +147,7 @@ function App() {
             </section>
 
             <NowBoarding entry={nowBoarding} />
+            <RecentlyBoarded entries={boardedHistory} />
 
             <section className="queue-section">
               <div className="section-heading">
